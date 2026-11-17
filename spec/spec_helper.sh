@@ -1,5 +1,7 @@
+#!/bin/sh
 # Shared setup for ShellSpec.
 ROOT=$(git rev-parse --show-toplevel)
+# shellcheck disable=SC2034
 GIT_HOOKS=$ROOT/bin/git-hooks
 PROGRAM=git-hooks
 . "$ROOT/lib/git-hooks.sh"

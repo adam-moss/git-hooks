@@ -1,3 +1,4 @@
+#!/bin/sh
 PROGRAM=${PROGRAM:-git-hooks}
 
 usage() {
@@ -81,7 +82,7 @@ add_trailer() {
 add_config_trailer() {
   file=$(message_file "$@")
   root=$(repo_root)
-  cd "$root"
+  cd "$root" || die "unable to change to repository root"
   config=$(find_config)
   digest=$(sha256_file "$config")
   case $digest in

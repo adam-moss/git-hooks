@@ -3,4 +3,5 @@
 #USAGE flag "--shell <shell>" help="Shell used to execute ShellSpec" default="sh"
 
 set -eu
+# shellcheck disable=SC2154
 exec shellspec --shell "$usage_shell"

@@ -1,3 +1,4 @@
+#!/bin/sh
 Describe 'git-hooks command integration'
   BeforeEach 'setup_repo'
   AfterEach 'cleanup_repo'

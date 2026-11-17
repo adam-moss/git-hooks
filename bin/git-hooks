@@ -5,6 +5,7 @@
 set -eu
 
 ROOT=$(CDPATH='' cd "$(dirname "$0")/.." && pwd)
+# shellcheck disable=SC1091
 # shellcheck source=../lib/git-hooks.sh
 . "$ROOT/lib/git-hooks.sh"
 

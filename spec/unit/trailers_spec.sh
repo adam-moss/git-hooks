@@ -1,3 +1,4 @@
+#!/bin/sh
 Describe 'normalise_skipped_steps'
   It 'trims whitespace, removes empty entries and deduplicates names'
     When call normalise_skipped_steps ' markdown, shellcheck,,markdown '
