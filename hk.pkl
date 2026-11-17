@@ -9,6 +9,7 @@ local checks = new Mapping<String, Step> {
   ["shellcheck"] = Builtins.shellcheck
 
   ["shfmt"] = (Builtins.shfmt) {
+    exclude = List("spec/**/*.sh")
     check = "shfmt -d -i 2 -ci {{files}}"
     fix = "shfmt -w -i 2 -ci {{files}}"
   }
