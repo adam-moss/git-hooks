@@ -147,8 +147,8 @@ signing_key() {
   [ -n "$key" ] || die "git config user.signingKey is not set"
 
   case $key in
-    \\~) key=$HOME ;;
-    \\~/*) key=$HOME/${key#\~/} ;;
+    \~) key=$HOME ;;
+    \~/*) key=$HOME/${key#\~/} ;;
   esac
 
   case $key in
