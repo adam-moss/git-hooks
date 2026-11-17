@@ -1,0 +1,4 @@
+# ShellSpec project configuration.
+--shell sh
+--pattern '*_spec.sh'
+--require spec_helper

@@ -1,0 +1,82 @@
+# Contributing
+
+Contributions are welcome. Please open an issue before substantial changes so
+that the intended behaviour and compatibility impact can be discussed.
+
+## Development setup
+
+Install the pinned tools and install hk's Git hooks:
+
+```sh
+mise install
+hk install --mise
+```
+
+Run the complete local validation suite:
+
+```sh
+mise run ci
+```
+
+Individual tasks are available:
+
+- `mise run lint:shell`
+- `mise run format:shell`
+- `mise run lint:markdown`
+- `mise run format:markdown`
+- `mise run lint:actions`
+- `mise run lint:links`
+- `mise run test`
+- `mise run docs:build`
+
+## Developer Certificate of Origin
+
+Every commit must include a DCO sign-off certifying the Developer Certificate
+of Origin. Sign off commits with:
+
+```sh
+git commit -s
+```
+
+To enable sign-off automatically for new commits in this repository:
+
+```sh
+git config format.signoff true
+```
+
+The sign-off identity is taken from your Git `user.name` and `user.email`.
+Use an identity and email address that you control and that are appropriate
+for public attribution.
+
+## Shell requirements
+
+- Write portable POSIX `sh`; do not rely on Bash, Zsh or shell-specific arrays.
+- Quote expansions unless splitting or globbing is intentional.
+- Use explicit error handling and useful diagnostics.
+- Never use `eval` with user-controlled input.
+- Do not log private key material, passphrases, tokens or other secrets.
+- Keep commands composable and return meaningful exit statuses.
+
+## Tests
+
+Use ShellSpec for unit and integration coverage. Run the suite with
+`mise run test`; CI runs it under `sh`, `bash` and `zsh`. Fish is tested
+separately as a calling shell for the POSIX CLI; ShellSpec does not execute
+specifications under Fish.
+
+Tests must not require access to a real SSH agent, a real signing key, or a
+network service. Use temporary Git repositories and stub executables where
+practical.
+
+## Pull requests
+
+- Explain the problem and the behavioural change.
+- Include tests and documentation.
+- Keep changes focused.
+- Do not update pinned tools without explaining why.
+- Ensure the CI workflow passes.
+- Never include credentials, private keys or personal data.
+
+Contributions are distributed under the Apache License, Version 2.0. By
+submitting a contribution, you agree that it may be distributed under those
+terms.

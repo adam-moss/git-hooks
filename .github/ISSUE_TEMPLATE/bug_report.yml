@@ -1,0 +1,24 @@
+name: Bug report
+description: Report incorrect or unexpected command behaviour.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and environment
+      description: Include the command, operating system, shell and Git version.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true

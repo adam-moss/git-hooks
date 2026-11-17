@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate and lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify DCO sign-offs
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -eu
+          git fetch --no-tags origin "$BASE_SHA"
+          for commit in $(git rev-list --no-merges "$BASE_SHA..HEAD"); do
+            if ! git show -s --format=%B "$commit" | grep -Eq '^Signed-off-by: .+ <[^<>]+>$'; then
+              printf 'Commit %s is missing a DCO Signed-off-by trailer\n' "$commit" >&2
+              exit 1
+            fi
+          done
+      - name: Install mise and project tools
+        uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install: true
+          cache: true
+      - name: Run validation
+        run: mise run ci
+
+  shellspec:
+    name: ShellSpec (${{ matrix.shell }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [sh, bash, zsh]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install zsh
+        if: matrix.shell == 'zsh'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y zsh
+      - name: Install mise and project tools
+        uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install: true
+          cache: true
+      - name: Run ShellSpec under selected shell
+        env:
+          TEST_SHELL: ${{ matrix.shell }}
+        run: mise exec -- shellspec --shell "$TEST_SHELL"
+
+  fish:
+    name: Fish compatibility smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install Fish
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y fish
+      - name: Run CLI from Fish
+        run: fish spec/shell/fish_smoke.fish
+
+  secrets:
+    name: Betterleaks secret scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install mise and project tools
+        uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install: true
+          cache: true
+      - name: Scan repository history for secrets
+        run: betterleaks git . --redact

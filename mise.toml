@@ -1,0 +1,44 @@
+[tools]
+go = "1.25.3"
+"go:github.com/betterleaks/betterleaks/v2" = "v2.0.0-rc.1"
+hk = "2.13.0"
+rumdl = "0.3.4"
+shellcheck = "0.11.0"
+shfmt = "3.12.0"
+"aqua:shellspec/shellspec" = "0.28.1"
+lychee = "0.21.0"
+zizmor = "1.22.0"
+actionlint = "1.7.7"
+"pipx:zensical" = "0.1.1"
+
+[env]
+HK_MISE = "1"
+_.path = ["bin"]
+
+[tasks."lint:markdown"]
+run = "rumdl check README.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md .github/pull_request_template.md docs"
+
+[tasks."format:markdown"]
+run = "rumdl fmt README.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md .github/pull_request_template.md docs"
+
+[tasks."lint:shell"]
+run = "shellcheck bin/git-hooks lib/*.sh spec/*.sh spec/unit/*.sh spec/integration/*.sh mise-tasks/*"
+
+[tasks."format:shell"]
+run = "shfmt -w -i 2 -ci bin/git-hooks lib/*.sh spec/*.sh spec/unit/*.sh spec/integration/*.sh mise-tasks/*"
+
+[tasks."lint:actions"]
+run = "actionlint && zizmor .github/workflows"
+
+[tasks."lint:links"]
+run = "hk check --all --slow --step lychee"
+
+[tasks."docs:build"]
+run = "zensical build --strict"
+
+[tasks."docs:serve"]
+run = "zensical serve"
+
+[tasks.ci]
+depends = ["docs:build"]
+run = "hk check --all --slow"

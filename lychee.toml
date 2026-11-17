@@ -1,0 +1,7 @@
+max_concurrency = 8
+timeout = 20
+max_retries = 2
+exclude_path = [".git", ".venv", "site"]
+
+# The documentation site is configured but is not published yet.
+exclude = ["^https://adam-moss\\.github\\.io/git-hooks/"]

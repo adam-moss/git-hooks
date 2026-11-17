@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# git-hooks: POSIX shell utilities for Git workflows.
+#
+set -eu
+
+ROOT=$(CDPATH='' cd "$(dirname "$0")/.." && pwd)
+# shellcheck disable=SC1091
+# shellcheck source=../lib/git-hooks.sh
+. "$ROOT/lib/git-hooks.sh"
+
+case ${1:-} in
+  --help | -h)
+    usage
+    ;;
+  trailers)
+    [ "$#" -ge 2 ] || {
+      usage >&2
+      exit 2
+    }
+    case $2 in
+      add-config-trailer)
+        shift 2
+        add_config_trailer "$@"
+        ;;
+      add-skipped-trailer)
+        shift 2
+        add_skipped_trailer "$@"
+        ;;
+      *)
+        usage >&2
+        exit 2
+        ;;
+    esac
+    ;;
+  signing)
+    [ "$#" -eq 2 ] || {
+      usage >&2
+      exit 2
+    }
+    case $2 in
+      add-ssh-key) add_ssh_key ;;
+      remove-ssh-key) remove_ssh_key ;;
+      *)
+        usage >&2
+        exit 2
+        ;;
+    esac
+    ;;
+  community-health)
+    [ "$#" -eq 2 ] || {
+      usage >&2
+      exit 2
+    }
+    case $2 in
+      block-push-skip-ci) reject_ci_skip ;;
+      *)
+        usage >&2
+        exit 2
+        ;;
+    esac
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

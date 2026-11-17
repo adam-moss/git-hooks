@@ -1,0 +1,6 @@
+.venv/
+.site/
+site/
+.cache/
+*.log
+.DS_Store
