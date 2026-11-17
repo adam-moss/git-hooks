@@ -14,6 +14,7 @@ nav = [
     { "Migration notes" = "migration.md" },
   ] },
   { "Project" = [
+    { "Documentation versions" = "versions.md" },
     { "Security" = "security.md" },
     { "Contributing" = "contributing.md" },
     { "Licensing" = "licensing.md" },
