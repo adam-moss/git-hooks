@@ -91,7 +91,7 @@ add_config_trailer() {
   config=$(find_config)
   digest=$(sha256_file "$config")
   case $digest in
-    ''|*[!0-9a-f]*) die "unable to calculate configuration digest" ;;
+    '' | *[!0-9a-f]*) die "unable to calculate configuration digest" ;;
   esac
   add_trailer "Git-Hooks-Config" "$config@sha256:$digest" "$file"
 }
@@ -108,7 +108,7 @@ normalise_skipped_steps() {
   IFS=$old_ifs
 
   result=
-  for item do
+  for item; do
     item=$(printf '%s' "$item" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
     [ -n "$item" ] || continue
     case $item in
@@ -212,11 +212,14 @@ reject_ci_skip() {
 }
 
 case ${1:-} in
-  --help|-h)
+  --help | -h)
     usage
     ;;
   trailers)
-    [ "$#" -ge 2 ] || { usage >&2; exit 2; }
+    [ "$#" -ge 2 ] || {
+      usage >&2
+      exit 2
+    }
     case $2 in
       add-config-trailer)
         shift 2
@@ -233,18 +236,30 @@ case ${1:-} in
     esac
     ;;
   signing)
-    [ "$#" -eq 2 ] || { usage >&2; exit 2; }
+    [ "$#" -eq 2 ] || {
+      usage >&2
+      exit 2
+    }
     case $2 in
       add-ssh-key) add_ssh_key ;;
       remove-ssh-key) remove_ssh_key ;;
-      *) usage >&2; exit 2 ;;
+      *)
+        usage >&2
+        exit 2
+        ;;
     esac
     ;;
   community-health)
-    [ "$#" -eq 2 ] || { usage >&2; exit 2; }
+    [ "$#" -eq 2 ] || {
+      usage >&2
+      exit 2
+    }
     case $2 in
       block-push-skip-ci) reject_ci_skip ;;
-      *) usage >&2; exit 2 ;;
+      *)
+        usage >&2
+        exit 2
+        ;;
     esac
     ;;
   *)
