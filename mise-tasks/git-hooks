@@ -11,8 +11,8 @@ ROOT=$(CDPATH='' cd "$(dirname "$0")/.." && pwd)
 
 if [ -n "${usage_argument:-}" ]; then
   # shellcheck disable=SC2154
-  # shellcheck disable=SC2154
-exec "$ROOT/bin/git-hooks" "$usage_group" "$usage_action" "$usage_argument"
+  exec "$ROOT/bin/git-hooks" "$usage_group" "$usage_action" "$usage_argument"
 fi
 
+# shellcheck disable=SC2154
 exec "$ROOT/bin/git-hooks" "$usage_group" "$usage_action"
