@@ -20,6 +20,21 @@ local checks = new Mapping<String, Step> {
 
   ["lychee"] = (Builtins.lychee) {
     profiles = List("slow")
+    exclude = List(
+      ".editorconfig",
+      ".gitattributes",
+      ".gitignore",
+      ".github/**/*.yml",
+      ".github/**/*.yaml",
+      "bin/**",
+      "lib/**",
+      "mise-tasks/**",
+      "spec/**",
+      "*.toml",
+      "*.pkl",
+      "*.json",
+      "*.jsonc"
+    )
   }
 
   ["newlines"] = Builtins.newlines
