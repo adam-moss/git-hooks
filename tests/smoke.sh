@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-ROOT=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
+ROOT=$(CDPATH='' cd "$(dirname "$0")/.." && pwd)
 GIT_HOOKS=$ROOT/bin/git-hooks
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' 0 HUP INT TERM
