@@ -61,9 +61,9 @@ EOF
       chmod +x fakebin/ssh-add
       : >id_ed25519
       git config gpg.format ssh
-      git config user.signingKey "$TMP/id_ed25519"
-      PATH="$TMP/fakebin:$PATH" "$2" signing add-ssh-key || exit
-      PATH="$TMP/fakebin:$PATH" "$2" signing remove-ssh-key || exit
+      git config user.signingKey "$1/id_ed25519"
+      PATH="$1/fakebin:$PATH" "$2" signing add-ssh-key || exit
+      PATH="$1/fakebin:$PATH" "$2" signing remove-ssh-key || exit
       cat ssh-add.log
     ' sh "$TMP" "$GIT_HOOKS"
     The output should include '-t 0'
