@@ -29,6 +29,25 @@ Individual tasks are available:
 - `mise run test`
 - `mise run docs:build`
 
+## Developer Certificate of Origin
+
+Every commit must include a DCO sign-off certifying the Developer Certificate
+of Origin. Sign off commits with:
+
+```sh
+git commit -s
+```
+
+To enable sign-off automatically for new commits in this repository:
+
+```sh
+git config format.signoff true
+```
+
+The sign-off identity is taken from your Git `user.name` and `user.email`.
+Use an identity and email address that you control and that are appropriate
+for public attribution.
+
 ## Shell requirements
 
 - Write portable POSIX `sh`; do not rely on Bash, Zsh or shell-specific arrays.
@@ -41,7 +60,10 @@ Individual tasks are available:
 ## Tests
 
 Use ShellSpec for unit and integration coverage. Run the suite with
-`mise run test`; use `mise run test --shell dash` to exercise it with dash.
+`mise run test`; CI runs it under `sh`, `bash` and `zsh`. Fish is tested
+separately as a calling shell for the POSIX CLI; ShellSpec does not execute
+specifications under Fish.
+
 Tests must not require access to a real SSH agent, a real signing key, or a
 network service. Use temporary Git repositories and stub executables where
 practical.
@@ -55,7 +77,6 @@ practical.
 - Ensure the CI workflow passes.
 - Never include credentials, private keys or personal data.
 
-By contributing, you agree that your contribution may be distributed under the
-project's eventual open-source licence. The project licence is currently
-unselected; please do not submit contributions until the repository owner has
-added a licence and clarified contribution terms.
+Contributions are distributed under the Apache License, Version 2.0. By
+submitting a contribution, you agree that it may be distributed under those
+terms.

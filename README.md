@@ -23,8 +23,10 @@ git-hooks signing remove-ssh-key
 git-hooks community-health block-push-skip-ci
 ```
 
-See the [documentation](docs/index.md) for installation,
-configuration, migration notes and contribution guidance.
+See the [documentation](https://adam-moss.github.io/git-hooks/latest/) for
+installation, configuration, migration notes and contribution guidance. Published
+documentation is versioned: the development build follows `main`, and release
+tags publish immutable version paths plus the `latest` alias.
 
 ## Development
 
@@ -34,14 +36,19 @@ hk install --mise
 mise run ci
 ```
 
-The project uses POSIX shell, ShellSpec, ShellCheck, shfmt, rumdl, lychee,
-actionlint, zizmor, Zensical, mise and hk.
+The project uses POSIX shell, ShellSpec, ShellCheck, shfmt, Betterleaks, rumdl,
+lychee, actionlint, zizmor, Zensical, mise and hk.
 
-Run the test suite with `mise run test`. The ShellSpec runner accepts
-`--shell` to select a compatible shell, for example `mise run test --shell dash`.
+Run ShellSpec under compatible shells with `mise run test --shell bash`,
+`mise run test --shell zsh`, or `mise run test --shell sh`. Fish is covered by
+a separate CLI compatibility smoke test; it is not a ShellSpec execution shell.
 The `mise run git-hooks` task exposes the CLI's subcommands with generated
 usage and completion support; direct `git-hooks` invocation remains available
 to Git and hk.
+
+Betterleaks scans staged changes in the pre-commit hook and scans repository
+history in CI. Scanner output is redacted; do not paste secret material into
+issues or logs.
 
 ## Security
 

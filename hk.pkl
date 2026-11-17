@@ -5,49 +5,35 @@ local checks = new Mapping<String, Step> {
   ["markdown"] = (Builtins.rumdl) {
     fix = "rumdl fmt {{files}}"
   }
-
   ["shellcheck"] = Builtins.shellcheck
-
   ["shfmt"] = (Builtins.shfmt) {
     exclude = List("spec/**/*.sh")
     check = "shfmt -d -i 2 -ci {{files}}"
     fix = "shfmt -w -i 2 -ci {{files}}"
   }
-
   ["actionlint"] = Builtins.actionlint
-
   ["zizmor"] = Builtins.zizmor
-
   ["lychee"] = (Builtins.lychee) {
     profiles = List("slow")
     exclude = List(
-      ".editorconfig",
-      ".gitattributes",
-      ".gitignore",
-      ".github/pull_request_template.md",
-      ".github/**/*.yml",
-      ".github/**/*.yaml",
-      "bin/**",
-      "lib/**",
-      "mise-tasks/**",
-      "spec/**",
-      "*.toml",
-      "*.pkl",
-      "*.json",
-      "*.jsonc"
+      ".editorconfig", ".gitattributes", ".gitignore",
+      ".github/pull_request_template.md", ".github/**/*.yml",
+      ".github/**/*.yaml", "bin/**", "lib/**", "mise-tasks/**",
+      "spec/**", "*.toml", "*.pkl", "*.json", "*.jsonc"
     )
   }
-
   ["newlines"] = Builtins.newlines
-
   ["byte-order-marker"] = Builtins.byte_order_marker
-
   ["check-case-conflict"] = Builtins.check_case_conflict
-
   ["check-merge-conflict"] = Builtins.check_merge_conflict
 
-  // ShellSpec runs the full unit and integration suite, so keep it out of
-  // the latency-sensitive pre-commit path and run it in CI's slow profile.
+  // Scan staged content before each commit. CI separately scans all Git history.
+  ["betterleaks-staged"] {
+    condition = "!exec_ok('git diff --cached --quiet')"
+    check = "git diff --cached --no-ext-diff --unified=0 | betterleaks stdin --git-diff --redact"
+  }
+
+  // Run the full suite in the slow profile; CI separately tests bash and zsh.
   ["shellspec"] {
     glob = "spec/**/*.sh"
     profiles = List("slow")
@@ -61,18 +47,13 @@ hooks {
     stash = "git"
     steps = checks
   }
-
   ["check"] {
     steps = checks
   }
-
   ["fix"] {
     fix = true
     steps = checks
   }
-
-  // Commit metadata is prepared before the editor opens. HK_SKIP_STEPS is
-  // still available to the skipped-check trailer command.
   ["prepare-commit-msg"] {
     fix = true
     steps {
@@ -88,7 +69,6 @@ hooks {
       }
     }
   }
-
   ["post-commit"] {
     fix = true
     steps {
@@ -98,7 +78,6 @@ hooks {
       }
     }
   }
-
   ["pre-push"] {
     steps {
       ["block-push-skip-ci"] {
