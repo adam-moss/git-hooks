@@ -23,6 +23,19 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+      - name: Verify DCO sign-offs
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -eu
+          git fetch --no-tags origin "$BASE_SHA"
+          for commit in $(git rev-list --no-merges "$BASE_SHA..HEAD"); do
+            if ! git show -s --format=%B "$commit" | grep -Eq '^Signed-off-by: .+ <[^<>]+>$'; then
+              printf 'Commit %s is missing a DCO Signed-off-by trailer\n' "$commit" >&2
+              exit 1
+            fi
+          done
       - name: Install mise and project tools
         uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
         with:
@@ -66,11 +79,6 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
-      - name: Install mise and project tools
-        uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
-        with:
-          install: true
-          cache: true
       - name: Install Fish
         run: |
           sudo apt-get update
