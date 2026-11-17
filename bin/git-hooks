@@ -143,8 +143,6 @@ add_skipped_trailer() {
 }
 
 signing_key() {
-  format=$(git config --get gpg.format 2>/dev/null || :)
-  [ "$format" = ssh ] || die "git config gpg.format must be ssh"
   key=$(git config --get user.signingKey 2>/dev/null || :)
   [ -n "$key" ] || die "git config user.signingKey is not set"
 

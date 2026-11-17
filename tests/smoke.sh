@@ -57,8 +57,8 @@ pass "CI-skip push option rejected"
   git add tracked.txt
   git commit -q -m 'feat: test [skip ci]'
   commit=$(git rev-parse HEAD)
-  if printf 'refs/heads/topic %s refs/heads/topic 0000000000000000000000000000000000000000\n' "$commit" |
-    "$GIT_HOOKS" community-health block-push-skip-ci >/dev/null 2>&1; then
+  push_update="refs/heads/topic $commit refs/heads/topic 0000000000000000000000000000000000000000"
+  if HK_HOOK_STDIN="$push_update" "$GIT_HOOKS" community-health block-push-skip-ci </dev/null >/dev/null 2>&1; then
     fail "skip-ci commit message was not rejected"
   fi
 )
