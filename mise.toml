@@ -40,5 +40,5 @@ run = "zensical serve"
 run = "sh tests/smoke.sh"
 
 [tasks.ci]
-depends = ["lint:markdown", "lint:shell", "lint:actions", "lint:links", "docs:build", "test"]
-run = "hk check --all"
+depends = ["lint:markdown", "lint:shell", "lint:actions", "docs:build", "test"]
+run = "hk check --all --slow"
