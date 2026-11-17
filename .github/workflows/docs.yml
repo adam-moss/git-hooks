@@ -57,10 +57,8 @@ jobs:
           set -eu
           if [ "$REF_TYPE" = "tag" ]; then
             version="$REF_NAME"
-            root_target="latest"
           else
             version="dev"
-            root_target="dev"
           fi
 
           mkdir .pages
@@ -84,6 +82,12 @@ jobs:
             rm -rf .pages/latest
             mkdir -p .pages/latest
             cp -R site/. .pages/latest/
+          fi
+
+          if [ -d .pages/latest ]; then
+            root_target="latest"
+          else
+            root_target="dev"
           fi
 
           cat >.pages/index.html <<HTML
