@@ -49,4 +49,50 @@ hooks {
     fix = true
     steps = checks
   }
+
+  // Commit metadata is prepared before the editor opens. HK_SKIP_STEPS is
+  // still available to the skipped-check trailer command.
+  ["prepare-commit-msg"] {
+    fix = true
+    steps {
+      ["config-trailer"] {
+        fix = "git-hooks trailers add-config-trailer {{commit_msg_file}}"
+      }
+      ["skipped-trailer"] {
+        fix = "git-hooks trailers add-skipped-trailer {{commit_msg_file}}"
+      }
+    }
+  }
+
+  // Load and unload the configured SSH signing identity around commits.
+  ["commit-msg"] {
+    fix = true
+    steps {
+      ["add-ssh-key"] {
+        condition = "exec_ok('git config --get user.signingKey')"
+        fix = "git-hooks signing add-ssh-key"
+      }
+    }
+  }
+
+  ["post-commit"] {
+    fix = true
+    steps {
+      ["remove-ssh-key"] {
+        condition = "exec_ok('git config --get user.signingKey')"
+        fix = "git-hooks signing remove-ssh-key"
+      }
+    }
+  }
+
+  // hk exposes the pre-push ref updates as hook_stdin. Pass them through
+  // stdin rather than interpolating untrusted ref names into a shell command.
+  ["pre-push"] {
+    steps {
+      ["block-push-skip-ci"] {
+        stdin = "{{hook_stdin}}"
+        check = "git-hooks community-health block-push-skip-ci"
+      }
+    }
+  }
 }

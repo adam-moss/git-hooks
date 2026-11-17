@@ -56,15 +56,17 @@ public key, an inline key expression, or an untrusted path.
 
 ## Block pushes that skip CI
 
-Configure the command as a Git `pre-push` hook:
+The repository's `hk.pkl` wires this command into Git's `pre-push` event.
+Install the configured hooks with:
 
 ```sh
-git-hooks community-health block-push-skip-ci
+hk install --mise
 ```
 
-It checks Git push options for `ci.skip` and `ci.no_pipeline`, and checks
-commits in the pushed ranges for GitHub/GitLab skip markers such as `[skip ci]`,
-`[ci skip]`, `[no ci]` and `[skip actions]`.
+hk passes its `hook_stdin` template value to the command's standard input.
+The command checks Git push options for `ci.skip` and `ci.no_pipeline`, and
+checks commits in the pushed ranges for GitHub/GitLab skip markers such as
+`[skip ci]`, `[ci skip]`, `[no ci]` and `[skip actions]`.
 
 This is a local guard only. Git hooks can be bypassed and do not replace
 server-side enforcement.
