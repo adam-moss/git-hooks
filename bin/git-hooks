@@ -66,7 +66,7 @@ find_config() {
     return
   fi
 
-  for candidate in hk.pkl .config/hk.pkl hk.local.pkl .config/hk.local.pkl .pre-commit-config.yaml; do
+  for candidate in hk.pkl .pre-commit-config.yaml; do
     if [ -f "$candidate" ]; then
       printf '%s\n' "$candidate"
       return

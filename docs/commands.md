@@ -14,10 +14,7 @@ The command finds the active configuration in this order:
 
 1. `GIT_HOOKS_CONFIG`, if set.
 2. `hk.pkl`.
-3. `.config/hk.pkl`.
-4. `hk.local.pkl`.
-5. `.config/hk.local.pkl`.
-6. `.pre-commit-config.yaml` for legacy repositories.
+3. `.pre-commit-config.yaml` for legacy repositories.
 
 It calculates a SHA-256 digest and uses `git interpret-trailers` to add or
 replace the `Git-Hooks-Config` trailer. The trailer records both the path and
@@ -48,9 +45,11 @@ git-hooks signing add-ssh-key
 git-hooks signing remove-ssh-key
 ```
 
-The add command verifies that the configured value names a readable private
-key file and passes it to `ssh-add` with no expiry. On macOS it also requests
-Keychain integration. The remove command asks `ssh-add` to remove that key.
+The hk `prepare-commit-msg` hook adds the configured key before the editor
+opens; `post-commit` removes it after a successful commit. The add command
+verifies that the configured value names a readable private key file and
+passes it to `ssh-add` with no expiry. On macOS it also requests Keychain
+integration. The remove command asks `ssh-add` to remove that key.
 
 The private key is never read by the script. Do not set `user.signingKey` to a
 public key, an inline key expression, or an untrusted path. The key is added
