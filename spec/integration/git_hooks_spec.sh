@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2016
 Describe 'git-hooks command integration'
   BeforeEach 'setup_repo'
   AfterEach 'cleanup_repo'
