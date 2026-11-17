@@ -23,7 +23,7 @@ git-hooks signing remove-ssh-key
 git-hooks community-health block-push-skip-ci
 ```
 
-See the [documentation](https://adam-moss.github.io/git-hooks/) for installation,
+See the [documentation](docs/index.md) for installation,
 configuration, migration notes and contribution guidance.
 
 ## Development
