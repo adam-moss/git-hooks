@@ -168,6 +168,8 @@ signing_key() {
 
 add_ssh_key() {
   require_command ssh-add
+  format=$(git config --get gpg.format 2>/dev/null || :)
+  [ "$format" = ssh ] || die "git config gpg.format must be ssh"
   key=$(signing_key)
   if [ "$(uname -s)" = Darwin ]; then
     ssh-add --apple-use-keychain -t 0 "$key"
@@ -182,14 +184,9 @@ remove_ssh_key() {
   ssh-add -d "$key"
 }
 
-reject_ci_skip() {
-  options=$(env | awk -F= '$1 ~ /^GIT_PUSH_OPTION_[0-9]+$/ { sub(/^[^=]*=/, ""); print }')
-  if printf '%s\n' "$options" | grep -Eiq '^(ci\.skip|ci\.no_pipeline)$'; then
-    die "Git push option requests skipping CI; remove ci.skip/ci.no_pipeline"
-  fi
-
+inspect_push_updates() {
   while read -r local_ref local_sha _remote_ref remote_sha; do
-    [ -n "${local_ref:-}" ] || continue
+    [ -n "$local_ref" ] || continue
     case $local_sha in
       *[!0]*) ;;
       *) continue ;;
@@ -211,6 +208,18 @@ reject_ci_skip() {
   done
 }
 
+reject_ci_skip() {
+  options=$(env | awk -F= '$1 ~ /^GIT_PUSH_OPTION_[0-9]+$/ { sub(/^[^=]*=/, ""); print }')
+  if printf '%s\n' "$options" | grep -Eiq '^(ci\.skip|ci\.no_pipeline)$'; then
+    die "Git push option requests skipping CI; remove ci.skip/ci.no_pipeline"
+  fi
+
+  if env | grep -q '^HK_HOOK_STDIN='; then
+    printf '%s\n' "$HK_HOOK_STDIN" | inspect_push_updates
+  else
+    inspect_push_updates
+  fi
+}
 case ${1:-} in
   --help | -h)
     usage
