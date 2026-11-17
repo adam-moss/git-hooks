@@ -40,7 +40,7 @@ to commit metadata.
 
 ## SSH signing key
 
-The signing commands read `user.signingKey` from Git configuration:
+The signing commands require `gpg.format=ssh` and read `user.signingKey` from Git configuration:
 
 ```sh
 git-hooks signing add-ssh-key
@@ -52,7 +52,9 @@ key file and passes it to `ssh-add` with no expiry. On macOS it also requests
 Keychain integration. The remove command asks `ssh-add` to remove that key.
 
 The private key is never read by the script. Do not set `user.signingKey` to a
-public key, an inline key expression, or an untrusted path.
+public key, an inline key expression, or an untrusted path. The key is added
+without an expiry and removed by hk's `post-commit` hook; if a commit is
+aborted after `prepare-commit-msg`, remove it manually with `ssh-add -d`.
 
 ## Block pushes that skip CI
 
