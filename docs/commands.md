@@ -40,7 +40,8 @@ to commit metadata.
 
 ## SSH signing key
 
-The signing commands require `gpg.format=ssh` and read `user.signingKey` from Git configuration:
+The signing commands require `gpg.format=ssh` and read `user.signingKey` from
+Git configuration:
 
 ```sh
 git-hooks signing add-ssh-key
