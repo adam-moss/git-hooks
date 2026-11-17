@@ -201,7 +201,7 @@ reject_ci_skip() {
     # Intentional splitting: git rev-list returns one hexadecimal object ID per line.
     # shellcheck disable=SC2086
     for commit in $commits; do
-      if git show -s --format=%B "$commit" | grep -Eiq '\[(skip ci|ci skip)\]'; then
+      if git show -s --format=%B "$commit" | grep -Eiq '\[(skip ci|ci skip|no ci|skip actions|actions skip)\]'; then
         die "commit $commit requests skipping CI; remove the skip marker"
       fi
     done

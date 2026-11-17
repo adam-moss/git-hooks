@@ -63,7 +63,8 @@ git-hooks community-health block-push-skip-ci
 ```
 
 It checks Git push options for `ci.skip` and `ci.no_pipeline`, and checks
-commits in the pushed ranges for `[skip ci]` or `[ci skip]` markers.
+commits in the pushed ranges for GitHub/GitLab skip markers such as `[skip ci]`,
+`[ci skip]`, `[no ci]` and `[skip actions]`.
 
 This is a local guard only. Git hooks can be bypassed and do not replace
 server-side enforcement.
