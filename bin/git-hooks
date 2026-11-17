@@ -90,6 +90,9 @@ add_config_trailer() {
   cd "$root"
   config=$(find_config)
   digest=$(sha256_file "$config")
+  case $digest in
+    ''|*[!0-9a-f]*) die "unable to calculate configuration digest" ;;
+  esac
   add_trailer "Git-Hooks-Config" "$config@sha256:$digest" "$file"
 }
 
