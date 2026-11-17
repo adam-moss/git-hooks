@@ -4,8 +4,8 @@
 #
 set -eu
 
-PROGRAM=${0##*/}
 ROOT=$(CDPATH='' cd "$(dirname "$0")/.." && pwd)
+# shellcheck source=../lib/git-hooks.sh
 . "$ROOT/lib/git-hooks.sh"
 
 case ${1:-} in

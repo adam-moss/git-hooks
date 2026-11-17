@@ -1,36 +1,45 @@
 amends "package://github.com/jdx/hk/releases/download/v2.13.0/hk@2.13.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.13.0/hk@2.13.0#/Builtins.pkl"
+
+local shellFiles = List("bin/git-hooks", "lib/**/*.sh", "spec/**/*.sh", "mise-tasks/*")
 
 local checks = new Mapping<String, Step> {
-  ["markdown"] {
-    glob = List("*.md", "docs/**/*.md")
-    check = "rumdl check {{files}}"
+  ["markdown"] = (Builtins.rumdl) {
     fix = "rumdl fmt {{files}}"
   }
 
-  ["shellcheck"] {
-    glob = List("bin/**", "tests/**/*.sh")
-    check = "shellcheck {{files}}"
+  ["shellcheck"] = (Builtins.shellcheck) {
+    glob = shellFiles
   }
 
-  ["shfmt"] {
-    glob = List("bin/**", "tests/**/*.sh")
+  ["shfmt"] = (Builtins.shfmt) {
+    glob = shellFiles
     check = "shfmt -d -i 2 -ci {{files}}"
     fix = "shfmt -w -i 2 -ci {{files}}"
   }
 
-  ["actionlint"] {
-    glob = ".github/workflows/*.yml"
-    check = "actionlint {{files}}"
-  }
+  ["actionlint"] = Builtins.actionlint
 
-  ["zizmor"] {
-    glob = ".github/workflows/*.yml"
-    check = "zizmor {{files}}"
-  }
+  ["zizmor"] = Builtins.zizmor
 
-  ["lychee"] {
+  ["lychee"] = (Builtins.lychee) {
     profiles = List("slow")
-    check = "lychee --config lychee.toml ."
+  }
+
+  ["newlines"] = Builtins.newlines
+
+  ["byte-order-marker"] = Builtins.byte_order_marker
+
+  ["check-case-conflict"] = Builtins.check_case_conflict
+
+  ["check-merge-conflict"] = Builtins.check_merge_conflict
+
+  // ShellSpec runs the full unit and integration suite, so keep it out of
+  // the latency-sensitive pre-commit path and run it in CI's slow profile.
+  ["shellspec"] {
+    glob = "spec/**/*.sh"
+    profiles = List("slow")
+    check = "shellspec"
   }
 }
 
@@ -79,7 +88,7 @@ hooks {
   }
 
   // hk exposes the pre-push ref updates as hook_stdin. Pass them through
-  // stdin rather than interpolating untrusted ref names into a shell command.
+  // an environment variable rather than interpolating untrusted ref names.
   ["pre-push"] {
     steps {
       ["block-push-skip-ci"] {
