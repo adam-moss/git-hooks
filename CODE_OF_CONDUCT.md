@@ -27,5 +27,4 @@ Project maintainers are responsible for clarifying and enforcing these
 standards. Report unacceptable behaviour through the repository's private
 contact or reporting facilities.
 
-This Code of Conduct is adapted from Contributor Covenant, version 2.1:
-https://www.contributor-covenant.org/version/2/1/code_of_conduct/
+This Code of Conduct is adapted from [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).

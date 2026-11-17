@@ -13,10 +13,10 @@ HK_MISE = "1"
 _.path = ["bin"]
 
 [tasks."lint:markdown"]
-run = "rumdl check README.md CONTRIBUTING.md SECURITY.md docs"
+run = "rumdl check README.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md .github/pull_request_template.md docs"
 
 [tasks."format:markdown"]
-run = "rumdl fmt README.md CONTRIBUTING.md SECURITY.md docs"
+run = "rumdl fmt README.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md .github/pull_request_template.md docs"
 
 [tasks."lint:shell"]
 run = "shellcheck bin/git-hooks tests/*.sh"
