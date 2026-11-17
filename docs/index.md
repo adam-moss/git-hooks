@@ -24,5 +24,9 @@ be invoked directly, from Git hooks, or through hk.
 | `signing remove-ssh-key` | Remove the configured SSH signing key from ssh-agent. |
 | `community-health block-push-skip-ci` | Reject push options or commits that request skipping CI. |
 
+Run the ShellSpec unit and integration suite with `mise run test`. It uses
+temporary Git repositories and stub executables, so it does not require a real
+SSH agent or network access.
+
 See [installation](installation.md), [commands](commands.md) and
 [migration notes](migration.md).

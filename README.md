@@ -34,8 +34,14 @@ hk install --mise
 mise run ci
 ```
 
-The project uses POSIX shell, ShellCheck, shfmt, rumdl, lychee, actionlint,
-zizmor, Zensical, mise and hk.
+The project uses POSIX shell, ShellSpec, ShellCheck, shfmt, rumdl, lychee,
+actionlint, zizmor, Zensical, mise and hk.
+
+Run the test suite with `mise run test`. The ShellSpec runner accepts
+`--shell` to select a compatible shell, for example `mise run test --shell dash`.
+The `mise run git-hooks` task exposes the CLI's subcommands with generated
+usage and completion support; direct `git-hooks` invocation remains available
+to Git and hk.
 
 ## Security
 

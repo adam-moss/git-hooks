@@ -3,6 +3,7 @@ hk = "2.13.0"
 rumdl = "0.3.4"
 shellcheck = "0.11.0"
 shfmt = "3.12.0"
+"aqua:shellspec/shellspec" = "0.28.1"
 lychee = "0.21.0"
 zizmor = "1.22.0"
 actionlint = "1.7.7"
@@ -19,16 +20,16 @@ run = "rumdl check README.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md .git
 run = "rumdl fmt README.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md .github/pull_request_template.md docs"
 
 [tasks."lint:shell"]
-run = "shellcheck bin/git-hooks tests/*.sh"
+run = "shellcheck bin/git-hooks lib/*.sh spec/*.sh spec/unit/*.sh spec/integration/*.sh mise-tasks/*"
 
 [tasks."format:shell"]
-run = "shfmt -w -i 2 -ci bin/git-hooks tests/*.sh"
+run = "shfmt -w -i 2 -ci bin/git-hooks lib/*.sh spec/*.sh spec/unit/*.sh spec/integration/*.sh mise-tasks/*"
 
 [tasks."lint:actions"]
 run = "actionlint && zizmor .github/workflows"
 
 [tasks."lint:links"]
-run = "lychee --config lychee.toml ."
+run = "hk check --all --slow --step lychee"
 
 [tasks."docs:build"]
 run = "zensical build --strict"
@@ -36,9 +37,6 @@ run = "zensical build --strict"
 [tasks."docs:serve"]
 run = "zensical serve"
 
-[tasks.test]
-run = "sh tests/smoke.sh"
-
 [tasks.ci]
-depends = ["lint:markdown", "lint:shell", "lint:actions", "docs:build", "test"]
+depends = ["docs:build"]
 run = "hk check --all --slow"

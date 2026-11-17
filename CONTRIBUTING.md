@@ -26,6 +26,7 @@ Individual tasks are available:
 - `mise run format:markdown`
 - `mise run lint:actions`
 - `mise run lint:links`
+- `mise run test`
 - `mise run docs:build`
 
 ## Shell requirements
@@ -39,9 +40,11 @@ Individual tasks are available:
 
 ## Tests
 
-Add regression coverage for new behaviour. Tests must not require access to a
-real SSH agent, a real signing key, or a network service. Use temporary Git
-repositories and stub executables where practical.
+Use ShellSpec for unit and integration coverage. Run the suite with
+`mise run test`; use `mise run test --shell dash` to exercise it with dash.
+Tests must not require access to a real SSH agent, a real signing key, or a
+network service. Use temporary Git repositories and stub executables where
+practical.
 
 ## Pull requests
 

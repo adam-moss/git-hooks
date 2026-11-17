@@ -1,0 +1,216 @@
+PROGRAM=${PROGRAM:-git-hooks}
+
+usage() {
+  cat <<'EOF'
+Usage:
+  git-hooks trailers add-config-trailer <commit-message-file>
+  git-hooks trailers add-skipped-trailer <commit-message-file>
+  git-hooks signing add-ssh-key
+  git-hooks signing remove-ssh-key
+  git-hooks community-health block-push-skip-ci
+  git-hooks --help
+
+Commands:
+  trailers add-config-trailer   Add or replace the active configuration digest trailer.
+  trailers add-skipped-trailer  Record hk steps explicitly skipped for this commit.
+  signing add-ssh-key           Add user.signingKey to ssh-agent.
+  signing remove-ssh-key        Remove user.signingKey from ssh-agent.
+  community-health block-push-skip-ci
+                                Reject pushes that request skipping CI.
+EOF
+}
+
+die() {
+  printf '%s: %s\n' "$PROGRAM" "$*" >&2
+  exit 1
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || die "required command not found: $1"
+}
+
+repo_root() {
+  git rev-parse --show-toplevel 2>/dev/null || die "not inside a Git working tree"
+}
+
+message_file() {
+  if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+    die "expected an existing commit-message file"
+  fi
+  case $1 in
+    /*) printf '%s\n' "$1" ;;
+    *) printf '%s/%s\n' "$PWD" "$1" ;;
+  esac
+}
+
+sha256_file() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | awk '{ print $1 }'
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | awk '{ print $1 }'
+  else
+    die "sha256sum or shasum is required"
+  fi
+}
+
+find_config() {
+  if [ -n "${GIT_HOOKS_CONFIG:-}" ]; then
+    [ -f "$GIT_HOOKS_CONFIG" ] || die "GIT_HOOKS_CONFIG does not name a file"
+    printf '%s\n' "$GIT_HOOKS_CONFIG"
+    return
+  fi
+
+  for candidate in hk.pkl .pre-commit-config.yaml; do
+    if [ -f "$candidate" ]; then
+      printf '%s\n' "$candidate"
+      return
+    fi
+  done
+
+  die "no hk.pkl or legacy pre-commit configuration found"
+}
+
+add_trailer() {
+  key=$1
+  value=$2
+  file=$3
+  require_command git
+  git interpret-trailers --in-place --if-exists replace --trailer "$key: $value" "$file"
+}
+
+add_config_trailer() {
+  file=$(message_file "$@")
+  root=$(repo_root)
+  cd "$root"
+  config=$(find_config)
+  digest=$(sha256_file "$config")
+  case $digest in
+    '' | *[!0-9a-f]*) die "unable to calculate configuration digest" ;;
+  esac
+  add_trailer "Git-Hooks-Config" "$config@sha256:$digest" "$file"
+}
+
+normalise_skipped_steps() {
+  raw=$1
+  old_ifs=$IFS
+  IFS=,
+  set -f
+  # Intentional splitting on commas only; pathname expansion is disabled.
+  # shellcheck disable=SC2086
+  set -- $raw
+  set +f
+  IFS=$old_ifs
+
+  result=
+  for item; do
+    item=$(printf '%s' "$item" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+    [ -n "$item" ] || continue
+    case $item in
+      *[!A-Za-z0-9._:/-]*)
+        die "invalid skipped step name: $item"
+        ;;
+    esac
+    case ",$result," in
+      *,"$item",*) ;;
+      *)
+        if [ -n "$result" ]; then
+          result=$result,$item
+        else
+          result=$item
+        fi
+        ;;
+    esac
+  done
+  printf '%s\n' "$result" | sed 's/,/, /g'
+}
+
+add_skipped_trailer() {
+  file=$(message_file "$@")
+  raw=${HK_SKIP_STEPS:-${HK_SKIP_STEP:-}}
+  if [ -z "$raw" ]; then
+    raw=$(git config --get hk.skipSteps 2>/dev/null || :)
+  fi
+  [ -n "$raw" ] || return 0
+  skipped=$(normalise_skipped_steps "$raw")
+  [ -n "$skipped" ] || return 0
+  add_trailer "Skipped-Checks" "$skipped" "$file"
+}
+
+signing_key() {
+  key=$(git config --get user.signingKey 2>/dev/null || :)
+  [ -n "$key" ] || die "git config user.signingKey is not set"
+
+  case $key in
+    \~) key=$HOME ;;
+    \~/*) key=$HOME/${key#\~/} ;;
+  esac
+
+  case $key in
+    key::*)
+      die "inline SSH signing keys cannot be added to ssh-agent; configure a private-key file"
+      ;;
+  esac
+
+  case $key in
+    /*) ;;
+    *) key=$(pwd)/$key ;;
+  esac
+
+  [ -f "$key" ] && [ -r "$key" ] || die "signing key is not a readable file: $key"
+  printf '%s\n' "$key"
+}
+
+add_ssh_key() {
+  require_command ssh-add
+  format=$(git config --get gpg.format 2>/dev/null || :)
+  [ "$format" = ssh ] || die "git config gpg.format must be ssh"
+  key=$(signing_key)
+  if [ "$(uname -s)" = Darwin ]; then
+    ssh-add --apple-use-keychain -t 0 "$key"
+  else
+    ssh-add -t 0 "$key"
+  fi
+}
+
+remove_ssh_key() {
+  require_command ssh-add
+  key=$(signing_key)
+  ssh-add -d "$key"
+}
+
+inspect_push_updates() {
+  while read -r local_ref local_sha _remote_ref remote_sha; do
+    [ -n "$local_ref" ] || continue
+    case $local_sha in
+      *[!0]*) ;;
+      *) continue ;;
+    esac
+
+    case $remote_sha in
+      *[!0]*) range=$remote_sha..$local_sha ;;
+      *) range=$local_sha ;;
+    esac
+
+    commits=$(git rev-list "$range" 2>/dev/null) || die "unable to inspect pushed commits for $local_ref"
+    # Intentional splitting: git rev-list returns one hexadecimal object ID per line.
+    # shellcheck disable=SC2086
+    for commit in $commits; do
+      if git show -s --format=%B "$commit" | grep -Eiq '\[(skip ci|ci skip|no ci|skip actions|actions skip)\]'; then
+        die "commit $commit requests skipping CI; remove the skip marker"
+      fi
+    done
+  done
+}
+
+reject_ci_skip() {
+  options=$(env | awk -F= '$1 ~ /^GIT_PUSH_OPTION_[0-9]+$/ { sub(/^[^=]*=/, ""); print }')
+  if printf '%s\n' "$options" | grep -Eiq '^(ci\.skip|ci\.no_pipeline)$'; then
+    die "Git push option requests skipping CI; remove ci.skip/ci.no_pipeline"
+  fi
+
+  if env | grep -q '^HK_HOOK_STDIN='; then
+    printf '%s\n' "$HK_HOOK_STDIN" | inspect_push_updates
+  else
+    inspect_push_updates
+  fi
+}

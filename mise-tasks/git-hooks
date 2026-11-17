@@ -1,0 +1,16 @@
+#!/bin/sh
+#MISE description="Run a git-hooks utility through mise"
+#USAGE arg "<group>" help="Utility group" {
+#USAGE   choices "trailers" "signing" "community-health"
+#USAGE }
+#USAGE arg "<action>" help="Utility action"
+#USAGE arg "[argument]" help="Optional commit-message file"
+
+set -eu
+ROOT=$(CDPATH='' cd "$(dirname "$0")/.." && pwd)
+
+if [ -n "${usage_argument:-}" ]; then
+  exec "$ROOT/bin/git-hooks" "$usage_group" "$usage_action" "$usage_argument"
+fi
+
+exec "$ROOT/bin/git-hooks" "$usage_group" "$usage_action"

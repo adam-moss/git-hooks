@@ -1,0 +1,3 @@
+# ShellSpec project configuration.
+--shell sh
+--pattern '*_spec.sh'
