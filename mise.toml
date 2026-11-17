@@ -6,7 +6,7 @@ shfmt = "3.12.0"
 lychee = "0.21.0"
 zizmor = "1.22.0"
 actionlint = "1.7.7"
-"pipx:zensical" = "0.0.24"
+"pipx:zensical" = "0.1.1"
 
 [env]
 HK_MISE = "1"

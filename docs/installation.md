@@ -12,8 +12,8 @@ git-hooks --help
 ```
 
 For a durable installation, install a tagged release through mise once release
-artifacts are published. The release process is designed to publish a
-versioned source archive and checksum file.
+artifacts are published. The release process publishes a versioned source
+archive, checksum file and GitHub build-provenance attestation.
 
 ## Requirements
 
@@ -27,14 +27,28 @@ file configured as `user.signingKey`.
 
 ## hk integration
 
-A repository can invoke commands from its own `hk.pkl`. For example:
+A repository can invoke commands from its own `hk.pkl`. For example, hk
+exposes `commit_msg_file` to the `prepare-commit-msg` and `commit-msg`
+hooks:
 
 ```pkl
-["git-hooks-config-trailer"] {
-  check = "git-hooks trailers add-config-trailer {{commit_msg_file}}"
+hooks {
+  ["prepare-commit-msg"] {
+    fix = true
+    steps {
+      ["config-trailer"] {
+        fix = "git-hooks trailers add-config-trailer {{commit_msg_file}}"
+      }
+    }
+  }
 }
 ```
 
-The command must be attached to a hook that supplies a commit-message file.
-Configure the appropriate Git lifecycle hook for your workflow; do not assume a
-generic hk check has a commit-message argument.
+Install hk's Git hooks with mise integration:
+
+```sh
+hk install --mise
+```
+
+See the [hk hook documentation](https://hk.jdx.dev/hooks.html) for event
+arguments and lifecycle details.

@@ -46,4 +46,22 @@ pass "skipped checks trailer"
 )
 pass "no trailer when no steps were skipped"
 
+if printf '' | GIT_PUSH_OPTION_0=ci.skip "$GIT_HOOKS" community-health block-push-skip-ci >/dev/null 2>&1; then
+  fail "ci.skip push option was not rejected"
+fi
+pass "CI-skip push option rejected"
+
+(
+  cd "$TMP"
+  printf 'file\n' >tracked.txt
+  git add tracked.txt
+  git commit -q -m 'feat: test [skip ci]'
+  commit=$(git rev-parse HEAD)
+  if printf 'refs/heads/topic %s refs/heads/topic 0000000000000000000000000000000000000000\n' "$commit" |
+    "$GIT_HOOKS" community-health block-push-skip-ci >/dev/null 2>&1; then
+    fail "skip-ci commit message was not rejected"
+  fi
+)
+pass "CI-skip commit marker rejected"
+
 printf 'All smoke tests passed.\n'

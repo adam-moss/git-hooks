@@ -98,6 +98,8 @@ normalise_skipped_steps() {
   old_ifs=$IFS
   IFS=,
   set -f
+  # Intentional splitting on commas only; pathname expansion is disabled.
+  # shellcheck disable=SC2086
   set -- $raw
   set +f
   IFS=$old_ifs
@@ -183,7 +185,7 @@ reject_ci_skip() {
     die "Git push option requests skipping CI; remove ci.skip/ci.no_pipeline"
   fi
 
-  while read -r local_ref local_sha remote_ref remote_sha; do
+  while read -r local_ref local_sha _remote_ref remote_sha; do
     [ -n "${local_ref:-}" ] || continue
     case $local_sha in
       *[!0]*) ;;
@@ -196,6 +198,8 @@ reject_ci_skip() {
     esac
 
     commits=$(git rev-list "$range" 2>/dev/null) || die "unable to inspect pushed commits for $local_ref"
+    # Intentional splitting: git rev-list returns one hexadecimal object ID per line.
+    # shellcheck disable=SC2086
     for commit in $commits; do
       if git show -s --format=%B "$commit" | grep -Eiq '\[(skip ci|ci skip)\]'; then
         die "commit $commit requests skipping CI; remove the skip marker"
