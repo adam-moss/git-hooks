@@ -1,0 +1,43 @@
+[tools]
+hk = "2.13.0"
+rumdl = "0.3.4"
+shellcheck = "0.11.0"
+shfmt = "3.12.0"
+lychee = "0.21.0"
+zizmor = "1.22.0"
+actionlint = "1.7.7"
+"pipx:zensical" = "0.0.24"
+
+[env]
+HK_MISE = "1"
+
+[tasks."lint:markdown"]
+run = "rumdl check README.md CONTRIBUTING.md SECURITY.md docs"
+
+[tasks."format:markdown"]
+run = "rumdl fmt README.md CONTRIBUTING.md SECURITY.md docs"
+
+[tasks."lint:shell"]
+run = "shellcheck bin/git-hooks tests/*.sh"
+
+[tasks."format:shell"]
+run = "shfmt -w -i 2 -ci bin/git-hooks tests/*.sh"
+
+[tasks."lint:actions"]
+run = "actionlint && zizmor .github/workflows"
+
+[tasks."lint:links"]
+run = "lychee --config lychee.toml ."
+
+[tasks."docs:build"]
+run = "zensical build --strict"
+
+[tasks."docs:serve"]
+run = "zensical serve"
+
+[tasks.test]
+run = "sh tests/smoke.sh"
+
+[tasks.ci]
+depends = ["lint:markdown", "lint:shell", "lint:actions", "lint:links", "docs:build", "test"]
+run = "hk check --all"

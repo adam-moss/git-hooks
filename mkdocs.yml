@@ -1,0 +1,36 @@
+site_name: Git Hooks
+site_description: Small POSIX shell utilities for safer and more consistent Git workflows.
+site_url: https://adam-moss.github.io/git-hooks/
+repo_url: https://github.com/adam-moss/git-hooks
+repo_name: adam-moss/git-hooks
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - content.action.edit
+
+nav:
+  - Home: index.md
+  - User guide:
+      - Installation: installation.md
+      - Commands: commands.md
+      - Migration notes: migration.md
+  - Project:
+      - Security: security.md
+      - Contributing: contributing.md
+      - Licensing: licensing.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+
+strict: true
