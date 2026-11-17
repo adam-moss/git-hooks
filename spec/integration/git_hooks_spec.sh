@@ -37,6 +37,7 @@ Describe 'git-hooks command integration'
   It 'rejects a push option that disables CI'
     When run command env GIT_PUSH_OPTION_0=ci.skip "$GIT_HOOKS" community-health block-push-skip-ci
     The status should be failure
+    The stderr should include 'Git push option requests skipping CI'
   End
 
   It 'rejects a pushed commit containing a CI skip marker'
@@ -50,6 +51,7 @@ Describe 'git-hooks command integration'
         "$2" community-health block-push-skip-ci
     ' sh "$TMP" "$GIT_HOOKS"
     The status should be failure
+    The stderr should include 'requests skipping CI'
   End
 
   It 'adds and removes the configured SSH key through ssh-agent'

@@ -15,5 +15,6 @@ Describe 'normalise_skipped_steps'
   It 'rejects step names containing unsafe characters'
     When run normalise_skipped_steps 'bad name'
     The status should be failure
+    The stderr should include 'invalid skipped step name'
   End
 End
