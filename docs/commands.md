@@ -66,8 +66,9 @@ Install the configured hooks with:
 hk install --mise
 ```
 
-hk passes its `hook_stdin` template value to the command's standard input.
-The command checks Git push options for `ci.skip` and `ci.no_pipeline`, and
+The hk step copies its `hook_stdin` template value into `HK_HOOK_STDIN`; direct
+invocations can supply the pre-push update lines on standard input. The command
+checks Git push options for `ci.skip` and `ci.no_pipeline`, and
 checks commits in the pushed ranges for GitHub/GitLab skip markers such as
 `[skip ci]`, `[ci skip]`, `[no ci]` and `[skip actions]`.
 
