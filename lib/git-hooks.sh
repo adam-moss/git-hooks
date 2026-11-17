@@ -92,35 +92,42 @@ add_config_trailer() {
 }
 
 normalise_skipped_steps() {
-  raw=$1
-  old_ifs=$IFS
-  IFS=,
-  set -f
-  # Intentional splitting on commas only; pathname expansion is disabled.
-  # shellcheck disable=SC2086
-  set -- $raw
-  set +f
-  IFS=$old_ifs
-
+  remaining=$1
   result=
-  for item; do
-    item=$(printf '%s' "$item" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
-    [ -n "$item" ] || continue
-    case $item in
-      *[!A-Za-z0-9._:/-]*)
-        die "invalid skipped step name: $item"
+  while :; do
+    case $remaining in
+      *,*)
+        item=${remaining%%,*}
+        remaining=${remaining#*,}
+        more=1
         ;;
-    esac
-    case ",$result," in
-      *,"$item",*) ;;
       *)
-        if [ -n "$result" ]; then
-          result=$result,$item
-        else
-          result=$item
-        fi
+        item=$remaining
+        remaining=
+        more=0
         ;;
     esac
+
+    item=$(printf '%s' "$item" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+    if [ -n "$item" ]; then
+      case $item in
+        *[!A-Za-z0-9._:/-]*)
+          die "invalid skipped step name: $item"
+          ;;
+      esac
+      case ",$result," in
+        *,"$item",*) ;;
+        *)
+          if [ -n "$result" ]; then
+            result=$result,$item
+          else
+            result=$item
+          fi
+          ;;
+      esac
+    fi
+
+    [ "$more" -eq 1 ] || break
   done
   printf '%s\n' "$result" | sed 's/,/, /g'
 }
